@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="modal fade" id="attendanceFace" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="exampleModalLabel">Yuz Skaner</h5>
+                <button  id="close_modal"  type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body mb-3 row align-items-end">
+                <img src="{{ url_for("video_feed") }}" class="w-100">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">Ishchi</h6>
+                <div id="facescaneralert" hidden class="alert alert-danger" role="alert">
+                    Error
+                </div>
+                {%if alert_message%}
+                <div class="alert alert-danger" role="alert">
+                    {{alert_message}}
+                </div>
+                {%endif%}
+                <form action="{{ url_for("updateworkerPOST") }}" method="POST" enctype="multipart/form-data">
+
+                    <div class="row align-items-center mb-3">
+
+                        <div class="col-3">
+
+                            <div class="card bg-dark justify-content-center">
+                                <img src="{{url_for('static',filename='img/person.png', _external=True)}}" id="person"
+                                    class="card-img-top" alt="person">
+                                <div class="card-body">
+                                    <button type="button" class="btn btn-outline-success w-100 bi bi-file-break"
+                                        data-bs-toggle="modal" data-bs-target="#attendanceFace">
+                                        Yuz Skaner
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-9">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Ism</label>
+                                <input type="text" required placeholder="Jackie" {%if name %} value="{{name}}" {%endif%}
+                                    class="form-control" id="name" name="name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="f_name" class="form-label">Familiya</label>
+                                <input type="text" placeholder="Chan" {%if f_name %} value="{{f_name}}" {%endif%}
+                                    class="form-control" id="f_name" name="f_name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Telefon Raqam</label>
+                                <input type="text" placeholder="998901234567" {%if phone %} value="{{phone}}" {%endif%}
+                                    class="form-control" id="phone" name="phone">
+                            </div>
+                            <div class="mb-3">
+                                <label for="salary" class="form-label">Bir soatlik maosh</label>
+                                <input type="number" required placeholder="10000" {%if salary %} value="{{salary}}"
+                                    {%endif%} class="form-control" id="salary" name="salary">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-6">
+                            <label for="come_time" class="form-label">Kelish vaqti</label>
+                            <input type="time" required {%if come_time %} value="{{come_time}}" {%endif%}
+                                class="form-control" id="come_time" name="come_time">
+                        </div>
+                        <div class="col-6">
+                            <label for="leave_time" class="form-label">Ketish vaqti</label>
+                            <input type="time" required {%if leave_time %} value="{{leave_time}}" {%endif%}
+                                class="form-control" id="leave_time" name="leave_time">
+                        </div>
+                    </div>
+
+                    <label class="form-label">Ish Kunlari</label>
+
+                    <div class="mb-5 btn-group w-100 px-4" role="group" aria-label="Basic checkbox toggle button group">
+                        <input type="checkbox" class="btn-check" id="btn-mon" name="mon" checked autocomplete="off">
+                        <label class="btn btn-outline-primary mx-1" for="btn-mon">Dushanba</label>
+
+                        <input type="checkbox" class="btn-check" id="btn-tue" name="tue" checked autocomplete="off">
+                        <label class="btn btn-outline-primary mx-1" for="btn-tue">Seshanba</label>
+
+                        <input type="checkbox" class="btn-check" id="btn-wen" name="wen" checked autocomplete="off">
+                        <label class="btn btn-outline-primary mx-1" for="btn-wen">Chorshanba</label>
+
+                        <input type="checkbox" class="btn-check" id="btn-thu" name="thu" checked autocomplete="off">
+                        <label class="btn btn-outline-primary mx-1" for="btn-thu">Payshanba</label>
+
+                        <input type="checkbox" class="btn-check" id="btn-fre" name="fre" checked autocomplete="off">
+                        <label class="btn btn-outline-primary mx-1" for="btn-fre">Juma</label>
+
+                        <input type="checkbox" class="btn-check" id="btn-sat" name="sat" checked autocomplete="off">
+                        <label class="btn btn-outline-primary mx-1" for="btn-sat">Shanba</label>
+
+                        <input type="checkbox" class="btn-check" id="btn-sun" name="sun" autocomplete="off">
+                        <label class="btn btn-outline-primary mx-1" for="btn-sun">Yakshanba</label>
+                    </div>
+                    <input type="text" value={{id}} name="id" hidden>
+                    <input type="text" hidden id="face_encodings" name="face_encodings" {%if face_encodings %}
+                        value="{{(face_encodings|string())[1:-1]}}" {%endif%}>
+                    <button type="submit" class="btn btn-success w-100">Saqlash</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
