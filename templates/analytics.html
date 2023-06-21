@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-12 mb-5">
+            <h3 class="mb-4">Ishchilarning Analitikasi</h3>
+            <form class="mb-5" action="{{ url_for("get_analytics")}}" method="POST">
+                <div class="mb-3 row align-items-end">
+                    <div class="col-2">
+                        <label for="first_penalty" class="form-label">1-Jarima Narxi</label>
+                        <input type="number" required {%if first_penalty %} value="{{first_penalty|string()}}" {%endif%}
+                            class="form-control bg-light text-dark" id="first_penalty" name="first_penalty">
+                    </div>
+                    <div class="col-2">
+                        <label for="remaining_penalty" class="form-label">Qolgan Jarimalar Narxi</label>
+                        <input type="number" required {%if remaining_penalty %} value="{{remaining_penalty}}" {%endif%}
+                            class="form-control bg-light text-dark" id="remaining_penalty" name="remaining_penalty">
+                    </div>
+
+                    <div class="col-2">
+                        <label for="from_date" class="form-label">Dan</label>
+                        <input type="date" required {%if from_date %} value="{{from_date}}" {%endif%}
+                            class="form-control bg-light text-dark" id="from_date" name="from_date">
+                    </div>
+                    <div class="col-2">
+                        <label for="to_date" class="form-label">Gacha</label>
+                        <input type="date" required {%if to_date %} value="{{to_date}}" {%endif%}
+                            class="form-control  bg-light text-dark" id="to_date" name="to_date">
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-outline-success w-100" type="submit">Analiz</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {%if summary is defined and attendance is defined%}
+
+        <div class="col-12 mb-5">
+            <h4>
+                Umumiy
+            </h4>
+            <div class="h-100">
+                <div class="table-responsive">
+                    <table class="table table-border rounded">
+                        <thead class="bg-success text-white">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Ism</th>
+                                <th scope="col">Familiya</th>
+                                <th scope="col">Kelgan</th>
+                                <th scope="col">Kech Kelgan</th>
+                                <th scope="col">Kelmagan</th>
+                                <th scope="col">Kech Kelgan soati</th>
+                                <th scope="col">Ishlagan soati</th>
+                                <th scope="col">Jarima</th>
+                                <th scope="col">Ish Haqi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for worker in summary.workers %}
+                            <tr class="table-light">
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{ worker.name }}</td>
+                                <td>{{ worker.f_name }}</td>
+                                <td>{{ worker.status_come }}</td>
+                                <td>{{ worker.status_come_with_late }}</td>
+                                <td>{{ worker.status_not_come }}</td>
+                                <td>{{ worker.late_penalty_times|round }}</td>
+                                <td>{{ worker.worker_worked_hours|round }}</td>
+                                <td>{{ worker.late_penalty_cost|round }}</td>
+                                <td>{{ "{:,.1f}".format(worker.earned_salary|round)}} so`m</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center">
+            <div class="col-6 p-1">
+                <canvas id="SummaryComedoughnutChart"></canvas>
+            </div>
+            <div class="col-6 p-1">
+                <canvas id="SummarySalarydoughnutChart"></canvas>
+            </div>
+        </div>
+        {% for date in attendance | sort(reverse = True)%}
+        <p class="mb-4">{{date}}</p>
+        <div class="col-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Ism</th>
+                                <th scope="col">Familiya</th>
+                                <th scope="col">Kelish Vaqti</th>
+                                <th scope="col">Ketish Vaqti</th>
+                                <th scope="col">Kelgan Vaqti</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Kech Kelgan Soat</th>
+                                <th scope="col">Jarima</th>
+                                <th scope="col">Ishlagan Soat</th>
+                                <th scope="col">Ish Haqi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for worker in attendance[date] %}
+                            {% if worker.is_need_come or worker.status!='Kelmadi' %}
+                            {% if worker.status == 'Kelmadi' %}
+                            <tr class="bg-danger text-white">
+                                {% elif worker.status == 'Kech Keldi' %}
+                            <tr class="bg-warning text-dark">
+                                {%else%}
+                            <tr class="bg-success text-white">
+                                {% endif %}
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{ worker.name }}</td>
+                                <td>{{ worker.f_name }}</td>
+                                <td>{{ worker.come_time }}</td>
+                                <td>{{ worker.leave_time }}</td>
+                                <td>{{ worker.come_datetime }}</td>
+                                <td>{{ worker.status }}</td>
+                                <td>{{ worker.late_penalty_times|round(1) }} soat</td>
+                                <td>{{ worker.late_penalty_cost|round(1) }}</td>
+                                <td>{{ worker.worker_worked_hours|round(1) }} soat</td>
+                                <td>{{ worker.earned_salary|round(1) }}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+</script>
+
+{%if summary is defined and attendance is defined%}
+<script>
+    var ctxD = document.getElementById("SummarySalarydoughnutChart").getContext('2d');
+    var myLineChart = new Chart(ctxD, {
+        type: 'doughnut',
+        data: {
+            labels: ["Jarima", "Ish Haqi"],
+            datasets: [{
+                data: [{{ summary.summary.late_penalty_cost | int }}, {{ summary.summary.earned_salary | int }}],
+        backgroundColor: ["#f1291d", "#9bb940"],
+        hoverBackgroundColor: ["#cf93ae", "#c0fe74"]
+    }]
+},
+    options: {
+        responsive: true
+    }
+});
+</script>
+
+<script>
+    var ctxD = document.getElementById("SummaryComedoughnutChart").getContext('2d');
+    var myLineChart = new Chart(ctxD, {
+        type: 'doughnut',
+        data: {
+            labels: ["Vaqtida Kelganlar", "Kech Kelganlar", "Kelmaganlar"],
+            datasets: [{
+                data: [{{ summary.summary.status_come_without_late | int }}, {{ summary.summary.status_come_with_late | int }}, {{ summary.summary.status_not_come | int }}],
+    backgroundColor: ["#46BFBD", "#FDB45C", "#F7464A"],
+        hoverBackgroundColor: ["#5AD3D1", "#FFC870", "#FF5A5E"]
+}]
+},
+    options: {
+        responsive: true
+    }
+});
+</script>
+{%endif%}
+{% endblock content %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+{%if workers is defined and workers|length>=1%}
+<div class="modal fade" id="attendanceQoshishsModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark" id="exampleModalLabel">Yangi Kelish yoki Ketish Qo`shish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form class="mb-5" action="{{ url_for("workers_is_come") }}" method="POST">
+                <div class="modal-body mb-3 row align-items-end">
+
+                    <div class="col-6 mb-5">
+                        <label for="date" class="form-label">Sana</label>
+                        <input type="date" required class="form-control bg-light text-dark" id="date" name="date">
+                    </div>
+                    <div class="col-6 mb-5">
+                        <label for="time" class="form-label">Vaqt</label>
+                        <input type="time" required class="form-control bg-light text-dark" id="time" name="time">
+                    </div>
+
+                    <div class="col-6 mb-5">
+                        <label for="worker" class="form-label">Ishchi</label>
+                        <select class="form-select bg-light text-dark" id="worker" name="worker_id">
+                            <option selected value={{workers[0].index}}>{{workers[0].name}} {{workers[0].f_name}}</option>
+                            {% for worker in workers[1:] %}
+                            <option value={{worker.index}}>{{worker.name}} {{worker.f_name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+
+                    <div class="col-6 mb-5">
+                        <label for="iscome" class="form-label">Keldi/Ketdi</label>
+                        <select class="form-select bg-light text-dark" id="iscome" name="iscome">
+                            <option selected value=1>Keldi</option>
+                            <option value=0>Ketdi</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Yangi Qo`shish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-12 mb-5">
+            <h3 class="mb-4">Ishchilarning Nazorati</h3>
+
+            <form class="mb-5" action="{{ url_for("workers_is_come") }}" method="GET">
+                <div class="mb-3 row align-items-end">
+
+                    <div class="col-4">
+                        <label for="from_date" class="form-label">Dan</label>
+                        <input type="date" required {%if from_date %} value="{{from_date}}" {%endif%}
+                            class="form-control bg-light text-dark" id="from_date" name="from_date">
+                    </div>
+                    <div class="col-4">
+                        <label for="to_date" class="form-label">Gacha</label>
+                        <input type="date" required {%if to_date %} value="{{to_date}}" {%endif%}
+                            class="form-control  bg-light text-dark" id="to_date" name="to_date">
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-outline-success w-100" type="submit">Qidirish</button>
+                    </div>
+
+                    <div class="col-1">
+                        Yangi Qo`shish
+                    </div>
+
+                    <div class="col-1">
+                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
+                            data-bs-target="#attendanceQoshishsModal">
+                            +
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {%if data is defined%}
+        {% for date in data | sort(reverse = True)%}
+        <p class="mb-4">{{date}}</p>
+        <div class="col-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Ism</th>
+                                <th scope="col">Familiya</th>
+                                <th scope="col">Kelish Vaqti</th>
+                                <th scope="col">Ketish Vaqti</th>
+                                <th scope="col">Kelgan/Ketgan Vaqti</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Tugma</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for worker in data[date] %}
+                            {% if worker.is_need_come or worker.status!='Kelmadi' %}
+                            {% if worker.status == 'Kelmadi' %}
+                            <tr class="bg-danger text-white">
+                                {% elif worker.status == 'Ketdi' %}
+                            <tr class="bg-warning text-dark">
+                                {%else%}
+                            <tr class="bg-success text-white">
+                                {% endif %}
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{ worker.name }}</td>
+                                <td>{{ worker.f_name }}</td>
+                                <td>{{ worker.come_time }}</td>
+                                <td>{{ worker.leave_time }}</td>
+                                <td>{{ worker.come_datetime }}</td>
+                                <td>{{ worker.status }}</td>
+                                <td>
+                                    {%if worker.status != 'Kelmadi' %}
+                                    <button style="width: 30px;height: 30px;" type="button"
+                                        class="btn btn-danger d-flex justify-content-center align-items-center"
+                                        onclick="confirm('O`chirib tashlasinmi?') ? window.location.href= `/deleteattendance/{{worker.attendance_id}}` : ''">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endblock content %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-10 my-4">
+            <form action="{{ url_for("set_camera_url") }}" method="POST">
+                <div class="row align-items-end">
+                    <div class="col-3">
+                        <label for="camera_url" class="form-label">Kamera URL</label>
+                    </div>
+                    <div class="col-5">
+                        <input type="text" required {%if camera_url %} value="{{camera_url}}" {%endif%} class="form-control bg-light text-dark" id="camera_url" name = "camera_url">
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-outline-success w-100" type="submit">Saqlash</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-9">
+            <img src="\get_capture" class="w-100">
+        </div>
+    </div>
+</div>
+{% endblock content %}

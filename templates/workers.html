@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4 align-items-center">
+        <div class="col-10 h5">
+            Ishchilar
+        </div>
+        <div class="col-1">
+            Yangi Qo`shish
+        </div>
+        <div class="col-1">
+            <a href="/createworker" type="button" class="btn btn-outline-success">
+                +
+            </a>
+        </div>
+
+        <div class="col-12">
+            <div class="bg-secondary rounded h-100 p-4">
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Ism</th>
+                                <th scope="col">Familiya</th>
+                                <th scope="col">Telefon</th>
+                                <th scope="col">Bir soatlik maosh</th>
+                                <th scope="col">Kelish Vaqti</th>
+                                <th scope="col">Ketish Vaqti</th>
+                                <th scope="col">Ishlash Hafta Kunlari</th>
+                                <th scope="col">O`chirish Tugmasi</th>
+                                <th scope="col">O`zgartirish Tugmasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for worker_id in workers %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{ workers[worker_id].name }}</td>
+                                <td>{{ workers[worker_id].f_name }}</td>
+                                <td>{{ workers[worker_id].phone }}</td>
+                                <td>{{ workers[worker_id].salary }}</td>
+                                <td>{{ (workers[worker_id].come_time|string())[:-3] }}</td>
+                                <td>{{ (workers[worker_id].leave_time|string())[:-3] }}</td>
+                                <td>{% for week in workers[worker_id].come_weeks %}
+                                    {{['Dush','Sesh','Chor','Pay','Jum','Shan','Yak'][week]}}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-danger"
+                                        onclick="confirm('O`chirib tashlasinmi?') ? window.location.href= `/deleteworker/{{worker_id}}` : ''">
+                                        O`chirish
+                                    </button>
+                                </td>
+                                <td>
+                                    <a href="/updateworker?id={{worker_id}}" type="button"
+                                        class="btn btn-outline-warning">
+                                        O`zgartirish
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
