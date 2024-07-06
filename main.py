@@ -159,11 +159,6 @@ def deleteattendance(id):
 
 if __name__ == '__main__':
     # Prod
-    # Camera_variables['running'] = True
     restart_CF_DICT_VARIABLES()
-    # app.run(host = "0.0.0.0", port = 5000 ,debug = False)
     ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     FlaskUI(app=app, server="flask", port=51232).run()
-
-    # Test
-    # app.run(host="0.0.0.0", port=5000, debug=False)
